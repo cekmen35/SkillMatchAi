@@ -15,3 +15,7 @@ node_modules
 .next/
 .DS_Store
 .codex-next-dev.log
+
+# Python
+__pycache__/
+*.pyc

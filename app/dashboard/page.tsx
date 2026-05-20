@@ -12,8 +12,8 @@ import {
   TrendingUp,
 } from "lucide-react"
 import { getSalaryInsight } from "@/lib/turkish-locale"
+import { readResumeText, resolveMatchScore } from "@/lib/match-api"
 import {
-  computeMatchScore,
   getApplications,
   getCurrentUser,
   getJobs,
@@ -63,9 +63,19 @@ export default function DashboardPage() {
     setApplyingId(job.id)
     setNotice("")
 
+    const all = getApplications()
+    const duplicate = all.some(
+      (a) => a.jobId === job.id && a.seekerId === user.id,
+    )
+    if (duplicate) {
+      setNotice("Bu ilana zaten başvurdunuz.")
+      setApplyingId(null)
+      return
+    }
+
     try {
-      const text = await file.text().catch(() => file.name)
-      const matchScore = computeMatchScore(text, job.requiredSkills)
+      const resumeText = await readResumeText(file)
+      const { matchScore, usedFallback } = await resolveMatchScore(job, resumeText)
 
       const application: StoredApplication = {
         id: `app-${Date.now()}`,
@@ -80,22 +90,17 @@ export default function DashboardPage() {
         appliedAt: Date.now(),
       }
 
-      const all = getApplications()
-      const duplicate = all.some(
-        (a) => a.jobId === job.id && a.seekerId === user.id,
-      )
-      if (duplicate) {
-        setNotice("Bu ilana zaten başvurdunuz.")
-        return
-      }
-
       all.push(application)
       saveApplications(all)
       setLastScore(matchScore)
       setNotice(
-        `${job.companyName} · ${job.title} başvurunuz kaydedildi. Eşleşme skoru: %${matchScore}`,
+        usedFallback
+          ? `${job.companyName} · ${job.title} başvurunuz kaydedildi (AI sunucusuna ulaşılamadı, yedek skor: %${matchScore}).`
+          : `${job.companyName} · ${job.title} başvurunuz kaydedildi. AI eşleşme skoru: %${matchScore}`,
       )
       loadData(user.id)
+    } catch {
+      setNotice("Başvuru sırasında bir hata oluştu. Lütfen tekrar deneyin.")
     } finally {
       setApplyingId(null)
     }
@@ -268,7 +273,7 @@ export default function DashboardPage() {
                     {appliedScore !== undefined
                       ? "Başvuruldu"
                       : applyingId === job.id
-                        ? "Analiz ediliyor..."
+                        ? "AI analiz ediliyor..."
                         : "Başvur & CV Yükle"}
                   </span>
                 </label>
