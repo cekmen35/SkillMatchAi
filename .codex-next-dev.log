@@ -1,0 +1,17 @@
+
+> my-project@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3001
+
+▲ Next.js 16.2.0 (Turbopack)
+- Local:         http://127.0.0.1:3001
+- Network:       http://127.0.0.1:3001
+✓ Ready in 699ms
+⨯ Another next dev server is already running.
+
+- Local:        http://localhost:3000
+- PID:          17456
+- Dir:          C:\Users\hacke\Downloads\Frontend2
+- Log:          .next\dev\logs\next-development.log
+
+Run taskkill /PID 17456 /F to stop it.
+[?25h
