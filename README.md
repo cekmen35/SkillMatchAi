@@ -99,7 +99,7 @@ SkillMatch AI is an intelligent career assistant platform that helps users match
 
 ## 👨‍💻 Author
 
-Mohammed Ayaan
+İBRAHİM ÇEKMEN
 
 ---
 
